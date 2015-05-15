@@ -13,7 +13,7 @@ This box defines a docker development environment. It basically installs
 
 * Have enough memory (VM requires 2GB) available. Change settings, if required, in Vagrantfile
 * Install [Vagrant](http://vagrantup.com)
-* Clone this repository `git clone https://github.com/rattermeyer/vagrant-docker-dev`
+* Clone this repository `git clone https://github.com/rattermeyer/vagrant-docker-host`
 * Provision a box `vagrant up`
 * Login `vagrant ssh` or using putty / ssh on localhost:2200
 
