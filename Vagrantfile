@@ -9,6 +9,8 @@ Vagrant.configure(2) do |config|
   config.vm.box = "ubuntu/trusty64"
   # forwarded port for shipyard
   config.vm.network "forwarded_port", guest: 8080, host: 8080
+  # forward port for consul (under /ui/)
+  config.vm.network "forwarded_port", guest: 8500, host: 8500
   if Vagrant.has_plugin?("vagrant-cachier")
     # Configure cached packages to be shared between instances of the same base box.
     # More info on http://fgrehm.viewdocs.io/vagrant-cachier/usage

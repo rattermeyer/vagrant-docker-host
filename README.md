@@ -15,5 +15,6 @@ This box defines a docker development environment. It basically installs
 * Install [Vagrant](http://vagrantup.com)
 * Clone this repository `git clone https://github.com/rattermeyer/vagrant-docker-host`
 * Provision a box `vagrant up`
-* Login `vagrant ssh` or using putty / ssh on localhost:2200
+    You need to reboot after the provisioning: `vagrant halt && vagrant up`
+* Login `vagrant ssh` or using putty / ssh on localhost:2222
 
