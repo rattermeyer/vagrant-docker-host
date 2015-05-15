@@ -7,6 +7,27 @@
 # you're doing.
 Vagrant.configure(2) do |config|
   config.vm.box = "ubuntu/trusty64"
+  # forwarded port for shipyard
+  config.vm.network "forwarded_port", guest: 8080, host: 8080
+  if Vagrant.has_plugin?("vagrant-cachier")
+    # Configure cached packages to be shared between instances of the same base box.
+    # More info on http://fgrehm.viewdocs.io/vagrant-cachier/usage
+    config.cache.scope = :box
+    config.vm.network "private_network", ip: "192.168.50.4"
+
+    # OPTIONAL: If you are using VirtualBox, you might want to use that to enable
+    # NFS for shared folders. This is also very useful for vagrant-libvirt if you
+    # want bi-directional sync
+    config.cache.synced_folder_opts = {
+      type: :nfs,
+      # The nolock option can be useful for an NFSv3 client that wants to avoid the
+      # NLM sideband protocol. Without this option, apt-get might hang if it tries
+      # to lock files needed for /var/cache/* operations. All of this can be avoided
+      # by using NFSv4 everywhere. Please note that the tcp option is not the default.
+      mount_options: ['rw', 'vers=3', 'tcp', 'nolock']
+    }
+    # For more information please check http://docs.vagrantup.com/v2/synced-folders/basic_usage.html
+  end
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -33,8 +54,8 @@ Vagrant.configure(2) do |config|
     # vb.gui = true
 
     # Customize the amount of memory on the VM:
-    vb.memory = "1024"
-    end
+    vb.memory = "2048"
+  end
   #
   # View the documentation for the provider you are using for more
   # information on available options.
@@ -43,15 +64,12 @@ Vagrant.configure(2) do |config|
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
+  config.vm.provision "shell", path: "ansible-setup.sh"
   config.vm.provision "shell", inline: <<-SHELL
-      sudo apt-get update
-      sudo apt-get install -y git vim curl build-essential cmake python-dev g++ 
-        # for emacs afficiandos
-        # sudo apt-get install emacs24-nox auto-complete-el magit org-mode puppet-el python-mode python-ropemacs ruby-mode scala-mode-el asciidoctor
-        git clone https://github.com/gmarik/Vundle.vim.git /home/vagrant/.vim/bundle/Vundle.vim	
-      curl -o /home/vagrant/.vimrc https://gist.githubusercontent.com/rattermeyer/4f2b0d48069a2f5345fd/raw/562aeb6bd1a9eadbb275190ec6fe8facf0f6430f/vimrc
-      chown -R vagrant: /home/vagrant
-      vim +PluginInstall +qall now
-      cd ~/.vim/bundle/YouCompleteMe/ && install.sh && cd -
+      apt-get update
+      apt-get install -y git vim curl build-essential cmake python-dev g++ moreutils
+      git clone https://github.com/rattermeyer/ansible-docker-host.git setup
+      cd setup
+      ansible-playbook -i inventory -vv site.yml
   SHELL
   end
